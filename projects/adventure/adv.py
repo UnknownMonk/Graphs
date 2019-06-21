@@ -22,8 +22,63 @@ world.printRooms()
 player = Player("Name", world.startingRoom)
 
 # Fill this out
-traversalPath = []
+oppositeDirections = {
+    "n": "s",
+    "e": "w",
+    "s": "n",
+    "w": "e"
+}
 
+traversalPath = []
+graph = {}
+graph[player.currentRoom.id] = {}
+for exit in player.currentRoom.getExits():
+    print(player.currentRoom.getExits())
+    graph[player.currentRoom.id][exit] = "?"
+
+print(graph)
+
+def getUnexploredDirection():
+    unexploredArr = []
+    exits = player.currentRoom.getExits()
+    if len(exits) > 0:
+        for exit in player.currentRoom.getExits():
+            if graph[player.currentRoom.id][exit] == "?":
+                unexploredArr.append(exit)
+        if len(unexploredArr) > 0:
+            random.shuffle(unexploredArr)
+            
+            return unexploredArr[0]
+   
+
+def exploreRooms():
+    q = []
+    visited = [0]
+    while len(visited) != len(roomGraph):
+        while getUnexploredDirection() != None:
+            
+            previousRoom = player.currentRoom.id
+            unexploredDirection = getUnexploredDirection()
+            # player.travel(unexploredDirection)
+            traversalPath.append(unexploredDirection)
+            q.append(unexploredDirection)
+            if player.currentRoom.id not in visited:
+                visited.append(player.currentRoom.id)
+                graph[player.currentRoom.id] = {}
+                for exit in player.currentRoom.getExits():
+                    graph[player.currentRoom.id][exit] = "?"
+            graph[previousRoom][unexploredDirection] = player.currentRoom.id
+            graph[player.currentRoom.id][oppositeDirections[unexploredDirection]] = previousRoom
+        if getUnexploredDirection() == None:
+            while getUnexploredDirection() == None and len(q) > 0:
+                player.travel(oppositeDirections[q[-1]])
+                traversalPath.append(oppositeDirections[q[-1]])
+                q.pop()
+
+exploreRooms()
+
+
+# print(mygraph)
 
 
 # TRAVERSAL TEST
